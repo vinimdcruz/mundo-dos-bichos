@@ -16,47 +16,84 @@ function obterContexto() {
   return contexto;
 }
 
-function tocarNota(freq, inicio, duracao, tipo = 'triangle', volume = 0.25) {
+// Duração de uma semínima a ~68 BPM
+const Q = 0.88;
+
+function tocarNota(freq, inicio, duracao, volume = 0.18) {
   const ctx = obterContexto();
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
   osc.connect(gain);
   gain.connect(ganhoMusica ?? ctx.destination);
-  osc.type = tipo;
+
+  // Sine soa mais suave e orgânico do que triangle
+  osc.type = 'sine';
   osc.frequency.value = freq;
-  gain.gain.setValueAtTime(0, ctx.currentTime + inicio);
-  gain.gain.linearRampToValueAtTime(volume, ctx.currentTime + inicio + 0.03);
-  gain.gain.linearRampToValueAtTime(0, ctx.currentTime + inicio + duracao - 0.03);
-  osc.start(ctx.currentTime + inicio);
-  osc.stop(ctx.currentTime + inicio + duracao);
+
+  // Envelope com ataque e decaimento suaves
+  const t = ctx.currentTime + inicio;
+  gain.gain.setValueAtTime(0, t);
+  gain.gain.linearRampToValueAtTime(volume, t + 0.08);
+  gain.gain.linearRampToValueAtTime(volume * 0.7, t + duracao * 0.5);
+  gain.gain.linearRampToValueAtTime(0, t + duracao);
+
+  osc.start(t);
+  osc.stop(t + duracao + 0.05);
 }
 
+function tocarBaixo(freq, inicio, duracao, volume = 0.07) {
+  const ctx = obterContexto();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ganhoMusica ?? ctx.destination);
+  osc.type = 'sine';
+  osc.frequency.value = freq;
+  const t = ctx.currentTime + inicio;
+  gain.gain.setValueAtTime(0, t);
+  gain.gain.linearRampToValueAtTime(volume, t + 0.12);
+  gain.gain.linearRampToValueAtTime(0, t + duracao);
+  osc.start(t);
+  osc.stop(t + duracao + 0.05);
+}
+
+// Melodia pentatônica suave em Sol maior (~68 BPM)
+// Uma voz só, movimento por graus conjuntos, notas longas
 const MELODIA = [
-  [523.25, 0.00, 0.16], // C5
-  [659.25, 0.18, 0.16], // E5
-  [783.99, 0.36, 0.16], // G5
-  [659.25, 0.54, 0.16], // E5
-  [587.33, 0.72, 0.16], // D5
-  [698.46, 0.90, 0.16], // F5
-  [880.00, 1.08, 0.24], // A5
-  [783.99, 1.34, 0.24], // G5
-  [523.25, 1.60, 0.16], // C5
-  [659.25, 1.78, 0.16], // E5
-  [783.99, 1.96, 0.16], // G5
-  [1046.5, 2.14, 0.32], // C6
-  [880.00, 2.48, 0.16], // A5
-  [783.99, 2.66, 0.16], // G5
-  [698.46, 2.84, 0.16], // F5
-  [659.25, 3.02, 0.32], // E5
-  [587.33, 3.36, 0.16], // D5
-  [523.25, 3.54, 0.46], // C5
+  [392.00, 0*Q,  Q*2  ], // G4  (mínima)
+  [440.00, 2*Q,  Q*1.5], // A4
+  [493.88, 3.5*Q,Q*1.5], // B4
+  [392.00, 5*Q,  Q*2  ], // G4  (mínima)
+  [329.63, 7*Q,  Q*2  ], // E4  (mínima)
+
+  [293.66, 9*Q,  Q    ], // D4
+  [329.63, 10*Q, Q*1.5], // E4
+  [392.00, 11.5*Q,Q*2 ], // G4
+  [440.00, 13.5*Q,Q*3 ], // A4  (pontuada)
+
+  [392.00, 16.5*Q,Q   ], // G4
+  [349.23, 17.5*Q,Q*1.5],// F#4
+  [329.63, 19*Q,  Q*2 ], // E4
+  [293.66, 21*Q,  Q*1.5],// D4
+  [261.63, 22.5*Q,Q*3.5],// C4  (pausa longa antes do loop)
 ];
 
-const DURACAO_LOOP = 4.2;
+// Baixo simples: raiz do acorde a cada dois tempos
+const BAIXO = [
+  [98.00,  0*Q,  Q*4 ], // G2
+  [98.00,  4*Q,  Q*4 ], // G2
+  [73.42,  8*Q,  Q*4 ], // D2
+  [98.00,  12*Q, Q*4 ], // G2
+  [65.41,  16*Q, Q*4 ], // C2
+  [98.00,  20*Q, Q*6 ], // G2 (segura até o loop)
+];
+
+const DURACAO_LOOP = 26 * Q;
 
 function agendarLoop() {
   if (!tocando) return;
   MELODIA.forEach(([freq, inicio, dur]) => tocarNota(freq, inicio, dur));
+  BAIXO.forEach(([freq, inicio, dur]) => tocarBaixo(freq, inicio, dur));
   timeoutLoop = setTimeout(agendarLoop, DURACAO_LOOP * 1000);
 }
 
