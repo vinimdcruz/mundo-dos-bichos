@@ -2,3 +2,4 @@
 
 # Áudios pré-gerados: commitados no repo (2MB total, ok para Vercel).
 # Para regenerar com voz diferente: bash scripts/gerar-audio.sh
+.vercel

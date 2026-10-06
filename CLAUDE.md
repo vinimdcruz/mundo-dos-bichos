@@ -61,3 +61,23 @@ a API TypeSafe se o jogo crescer o suficiente para justificar IA real.
 
 O arquivo `index.html` pode ser publicado como Artifact no Claude Code para testar no celular rapidamente.
 Ao publicar, incluir todos os arquivos de suporte via `files:`.
+
+## Workflow com worktree
+
+Para tarefas paralelas que não dependem uma das outras, usar git worktree para isolar o trabalho:
+
+```bash
+git worktree add --no-checkout -b feature/x /path/to/worktree-x main
+cd /path/to/worktree-x
+git checkout
+# trabalho em paralelo
+```
+
+Após o trabalho, deletar e remover:
+
+```bash
+git worktree remove /path/to/worktree-x
+git branch -D feature/x  # se quiser deletar a branch também
+```
+
+Isso permite rodar testes, desenvolver features ou fazer review em paralelo sem contaminar a branch principal.
