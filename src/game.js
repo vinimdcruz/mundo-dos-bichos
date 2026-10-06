@@ -57,7 +57,11 @@ async function novaRodada() {
 
   $nomeAnimal.textContent = ANIMAIS[estado.indiceAlvo].nome;
   $cartoes.forEach((cartao, i) => {
-    cartao.textContent = ANIMAIS[opcoes[i]].emoji;
+    const img = document.createElement('img');
+    img.src = ANIMAIS[opcoes[i]].imagem;
+    img.alt = '';
+    img.draggable = false;
+    cartao.replaceChildren(img);
     cartao.className = 'cartao-animal';
     cartao.dataset.indice = opcoes[i];
   });

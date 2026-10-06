@@ -161,9 +161,17 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(3.5rem, 14vw, 5.5rem);
+  overflow: hidden;
   cursor: pointer;
   transition: transform 0.12s, border-color 0.15s, background 0.15s;
+}
+.cartao-animal img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 .cartao-animal:active { transform: scale(0.93); }
 
