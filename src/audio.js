@@ -8,18 +8,14 @@
  * de agendar notas é obrigatório para funcionar no Safari/Chrome iOS.
  */
 
-let contexto = null;
+import { obterContexto } from './contexto-audio.js';
+
 let ganhoMusica = null;
 let tocando = false;
 let timeoutLoop = null;
 
 // Noise buffer compartilhado (gerado uma vez, reutilizado nos drums)
 let noiseBuffer = null;
-
-function obterContexto() {
-  if (!contexto) contexto = new (window.AudioContext || window.webkitAudioContext)();
-  return contexto;
-}
 
 function obterNoiseBuffer() {
   if (noiseBuffer) return noiseBuffer;

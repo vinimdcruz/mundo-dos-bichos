@@ -1,35 +1,42 @@
 /**
  * Módulo de fala.
  *
- * Toca arquivos WAV pré-gerados de assets/audio/{nome}.wav.
- * Fallback para Web Speech API se o arquivo não estiver em cache.
+ * Carrega os WAVs via fetch + decodeAudioData e toca pelo mesmo AudioContext
+ * da música. Isso evita o conflito iOS onde HTMLAudioElement suspende o
+ * AudioContext do Web Audio API.
  *
- * IMPORTANTE (iOS): Audio.play() só funciona fora de um gesto do usuário
- * se o elemento já foi criado e carregado dentro de um gesto anterior.
- * Por isso, chamar precarregarAudios() dentro do handler do botão iniciar.
+ * Fallback para Web Speech API se o buffer não estiver pronto.
  */
 
+import { obterContexto } from './contexto-audio.js';
+
 const CAMINHO_AUDIO = 'assets/audio';
-const cache = new Map();
+const buffers = new Map(); // nome -> AudioBuffer
 let vozFallback = null;
 
 /**
- * Pré-carrega todos os Audio elements durante um gesto do usuário.
- * Deve ser chamado diretamente no handler de clique (sem await antes).
+ * Dispara o carregamento de todos os WAVs em background.
+ * Não bloqueia — chamar logo após o AudioContext estar ativo (pós-gesto).
  *
  * @param {string[]} nomes
  */
 export function precarregarAudios(nomes) {
-  nomes.forEach(nome => {
-    if (cache.has(nome)) return;
-    const audio = new Audio(`${CAMINHO_AUDIO}/${encodeURIComponent(nome)}.wav`);
-    audio.load();
-    cache.set(nome, audio);
+  nomes.forEach(async nome => {
+    if (buffers.has(nome)) return;
+    try {
+      const resp = await fetch(`${CAMINHO_AUDIO}/${encodeURIComponent(nome)}.wav`);
+      if (!resp.ok) return;
+      const arrayBuffer = await resp.arrayBuffer();
+      const buffer = await obterContexto().decodeAudioData(arrayBuffer);
+      buffers.set(nome, buffer);
+    } catch {
+      // silencia erros de rede; fallback para síntese quando o nome for pedido
+    }
   });
 }
 
 /**
- * Inicializa o fallback de síntese de voz (Web Speech API).
+ * Inicializa o fallback de síntese de voz.
  * Chamar uma vez no carregamento da página.
  */
 export function inicializarFala() {
@@ -50,29 +57,28 @@ export function inicializarFala() {
 }
 
 /**
- * Fala o nome do animal.
- * Usa o WAV do cache; fallback para síntese de voz.
+ * Fala o nome do animal via AudioContext (sem interromper a música).
  *
  * @param {string} nome
  */
-export async function falarNomeAnimal(nome) {
-  const tocou = await tentarWav(nome);
-  if (!tocou) usarSintese(nome);
+export function falarNomeAnimal(nome) {
+  const buffer = buffers.get(nome);
+  if (buffer) {
+    const ctx = obterContexto();
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    // Voz um pouco mais alta que a música
+    const gain = ctx.createGain();
+    gain.gain.value = 2.0;
+    source.connect(gain);
+    gain.connect(ctx.destination);
+    source.start();
+  } else {
+    usarSintese(nome);
+  }
 }
 
 // ── Interno ───────────────────────────────────────────────────────────────────
-
-async function tentarWav(nome) {
-  try {
-    const audio = cache.get(nome);
-    if (!audio) return false;
-    audio.currentTime = 0;
-    await audio.play();
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 function usarSintese(texto) {
   if (!('speechSynthesis' in window)) return;
