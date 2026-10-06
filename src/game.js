@@ -13,10 +13,10 @@ import {
   tocarSomAcerto, tocarSomErro,
 }                                from './audio.js';
 import {
-  jevEscolherAnimais,
-  jevAvaliarProgresso,
-  jevVerificarResposta,
-}                                from './jev.js';
+  escolherAnimais,
+  avaliarProgresso,
+  verificarResposta,
+}                                from './logica.js';
 
 // ── Estado ────────────────────────────────────────────────────────────────────
 
@@ -47,7 +47,7 @@ const $btnIniciar    = document.getElementById('btn-iniciar');
 async function novaRodada() {
   estado.bloqueado = false;
 
-  const opcoes = await jevEscolherAnimais(estado);
+  const opcoes = await escolherAnimais(estado);
   estado.opcoes = opcoes;
 
   estado.indicesRecentes = [...estado.indicesRecentes, ...opcoes].slice(-8);
@@ -73,7 +73,7 @@ async function aoTocarCartao(cartao) {
   estado.bloqueado = true;
 
   const indiceTocado = parseInt(cartao.dataset.indice, 10);
-  const resultado = await jevVerificarResposta(indiceTocado, estado.indiceAlvo);
+  const resultado = await verificarResposta(indiceTocado, estado.indiceAlvo);
 
   estado.total++;
 
@@ -94,7 +94,7 @@ async function aoTocarCartao(cartao) {
   }
 
   atualizarPontuacao();
-  jevAvaliarProgresso(estado);
+  avaliarProgresso(estado);
 
   setTimeout(() => {
     esconderFeedback();
