@@ -16,8 +16,8 @@ function obterContexto() {
   return contexto;
 }
 
-// Duração de uma semínima a ~68 BPM
-const Q = 0.88;
+// Duração de uma semínima a ~82 BPM
+const Q = 0.73;
 
 function tocarNota(freq, inicio, duracao, volume = 0.18) {
   const ctx = obterContexto();
@@ -135,7 +135,7 @@ export function tocarSomAcerto() {
     osc.type = 'triangle';
     osc.frequency.value = f;
     g.gain.setValueAtTime(0, base + i * 0.1);
-    g.gain.linearRampToValueAtTime(0.4, base + i * 0.1 + 0.02);
+    g.gain.linearRampToValueAtTime(0.2, base + i * 0.1 + 0.02);
     g.gain.linearRampToValueAtTime(0, base + i * 0.1 + 0.18);
     osc.start(base + i * 0.1);
     osc.stop(base + i * 0.1 + 0.22);
@@ -152,7 +152,7 @@ export function tocarSomErro() {
     osc.type = 'sawtooth';
     osc.frequency.value = f;
     g.gain.setValueAtTime(0, base + i * 0.18);
-    g.gain.linearRampToValueAtTime(0.2, base + i * 0.18 + 0.02);
+    g.gain.linearRampToValueAtTime(0.1, base + i * 0.18 + 0.02);
     g.gain.linearRampToValueAtTime(0, base + i * 0.18 + 0.2);
     osc.start(base + i * 0.18);
     osc.stop(base + i * 0.18 + 0.22);
