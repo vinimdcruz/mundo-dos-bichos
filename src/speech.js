@@ -1,19 +1,36 @@
 /**
  * Módulo de fala.
  *
- * Estratégia: tenta tocar o arquivo WAV pré-gerado em assets/audio/{nome}.wav.
- * Se não encontrar (404) ou falhar, cai para Web Speech API com pt-BR.
- * Os WAVs foram gerados pela voz Luciana (macOS) via scripts/gerar-audio.sh.
+ * Toca arquivos WAV pré-gerados de assets/audio/{nome}.wav.
+ * Fallback para Web Speech API se o arquivo não estiver em cache.
+ *
+ * IMPORTANTE (iOS): Audio.play() só funciona fora de um gesto do usuário
+ * se o elemento já foi criado e carregado dentro de um gesto anterior.
+ * Por isso, chamar precarregarAudios() dentro do handler do botão iniciar.
  */
 
 const CAMINHO_AUDIO = 'assets/audio';
-
-// Cache de Audio elements para evitar recarregamento
 const cache = new Map();
+let vozFallback = null;
 
 /**
- * Inicializa o módulo. Chamar uma vez no início do jogo.
- * Pré-seleciona a melhor voz pt-BR disponível para o fallback.
+ * Pré-carrega todos os Audio elements durante um gesto do usuário.
+ * Deve ser chamado diretamente no handler de clique (sem await antes).
+ *
+ * @param {string[]} nomes
+ */
+export function precarregarAudios(nomes) {
+  nomes.forEach(nome => {
+    if (cache.has(nome)) return;
+    const audio = new Audio(`${CAMINHO_AUDIO}/${encodeURIComponent(nome)}.wav`);
+    audio.load();
+    cache.set(nome, audio);
+  });
+}
+
+/**
+ * Inicializa o fallback de síntese de voz (Web Speech API).
+ * Chamar uma vez no carregamento da página.
  */
 export function inicializarFala() {
   if (!('speechSynthesis' in window)) return;
@@ -32,37 +49,23 @@ export function inicializarFala() {
   window.speechSynthesis.addEventListener('voiceschanged', selecionarVoz, { once: true });
 }
 
-let vozFallback = null;
-
 /**
  * Fala o nome do animal.
- * Prioriza o arquivo WAV; usa síntese de voz como fallback.
+ * Usa o WAV do cache; fallback para síntese de voz.
  *
- * @param {string} nome - nome do animal em português
+ * @param {string} nome
  */
 export async function falarNomeAnimal(nome) {
-  const tocou = await tentarArquivoWav(nome);
+  const tocou = await tentarWav(nome);
   if (!tocou) usarSintese(nome);
 }
 
 // ── Interno ───────────────────────────────────────────────────────────────────
 
-async function tentarArquivoWav(nome) {
-  const nomeEncoded = encodeURIComponent(nome);
-  const arquivo = `${CAMINHO_AUDIO}/${nomeEncoded}.wav`;
-
+async function tentarWav(nome) {
   try {
-    let audio = cache.get(nome);
-
-    if (!audio) {
-      // Verifica se o arquivo existe antes de criar o elemento
-      const resp = await fetch(arquivo, { method: 'HEAD' });
-      if (!resp.ok) return false;
-
-      audio = new Audio(arquivo);
-      cache.set(nome, audio);
-    }
-
+    const audio = cache.get(nome);
+    if (!audio) return false;
     audio.currentTime = 0;
     await audio.play();
     return true;

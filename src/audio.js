@@ -1,6 +1,9 @@
 /**
  * Módulo de áudio: música de fundo sintetizada + efeitos sonoros.
- * Usa Web Audio API para não depender de arquivos externos.
+ *
+ * IMPORTANTE (iOS): AudioContext.resume() é assíncrono. iniciarMusica()
+ * retorna uma Promise; aguardar antes de agendar notas garante que o
+ * contexto está ativo quando os osciladores forem criados.
  */
 
 let contexto = null;
@@ -13,7 +16,7 @@ function obterContexto() {
   return contexto;
 }
 
-function tocarNota(freq, inicio, duracao, tipo = 'triangle', volume = 0.3) {
+function tocarNota(freq, inicio, duracao, tipo = 'triangle', volume = 0.25) {
   const ctx = obterContexto();
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
@@ -28,7 +31,6 @@ function tocarNota(freq, inicio, duracao, tipo = 'triangle', volume = 0.3) {
   osc.stop(ctx.currentTime + inicio + duracao);
 }
 
-// Melodia alegre em Dó maior (C4 = 261 Hz, escala diatônica)
 const MELODIA = [
   [523.25, 0.00, 0.16], // C5
   [659.25, 0.18, 0.16], // E5
@@ -54,14 +56,16 @@ const DURACAO_LOOP = 4.2;
 
 function agendarLoop() {
   if (!tocando) return;
-  MELODIA.forEach(([freq, inicio, dur]) => tocarNota(freq, inicio, dur, 'triangle', 0.25));
+  MELODIA.forEach(([freq, inicio, dur]) => tocarNota(freq, inicio, dur));
   timeoutLoop = setTimeout(agendarLoop, DURACAO_LOOP * 1000);
 }
 
-export function iniciarMusica() {
+export async function iniciarMusica() {
   if (tocando) return;
+
   const ctx = obterContexto();
-  if (ctx.state === 'suspended') ctx.resume();
+  // Aguarda o resume antes de agendar — crítico no iOS
+  await ctx.resume();
 
   ganhoMusica = ctx.createGain();
   ganhoMusica.gain.value = 0.22;
