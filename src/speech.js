@@ -48,7 +48,8 @@ export async function falarNomeAnimal(nome) {
 // ── Interno ───────────────────────────────────────────────────────────────────
 
 async function tentarArquivoWav(nome) {
-  const arquivo = `${CAMINHO_AUDIO}/${nome}.wav`;
+  const nomeEncoded = encodeURIComponent(nome);
+  const arquivo = `${CAMINHO_AUDIO}/${nomeEncoded}.wav`;
 
   try {
     let audio = cache.get(nome);
