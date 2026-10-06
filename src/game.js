@@ -145,15 +145,11 @@ $cartoes.forEach(cartao => {
 inicializarFala();
 
 $btnIniciar.addEventListener('click', async () => {
-  $btnIniciar.textContent = 'Carregando…';
-  $btnIniciar.disabled = true;
+  // Pré-carrega todos os áudios AQUI, dentro do gesto — obrigatório no iOS
+  precarregarAudios(ANIMAIS.map(a => a.nome));
 
-  // Desbloqueia o AudioContext dentro do gesto — obrigatório no iOS
+  // Aguarda o AudioContext estar ativo antes de continuar
   await iniciarMusica();
-
-  // Aguarda todos os WAVs decodificados antes de começar
-  // (buffers no mesmo AudioContext; sem HTMLAudioElement = sem conflito iOS)
-  await precarregarAudios(ANIMAIS.map(a => a.nome));
 
   $telaInicial.style.opacity = '0';
   $telaInicial.style.transition = 'opacity 0.3s';
