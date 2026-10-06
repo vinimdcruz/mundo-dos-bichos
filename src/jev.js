@@ -1,89 +1,46 @@
 /**
- * Camada de integração JEV (TypeSafe AI).
+ * Lógica adaptativa do jogo.
  *
- * Cada função tem implementação fallback local e um bloco TODO
- * indicando como substituir pela chamada real à API quando disponível.
- *
- * Para ativar a integração real:
- *   1. Defina JEV_API_KEY (via variável de ambiente ou config)
- *   2. Descomente os blocos marcados com "TODO: JEV real"
- *   3. Instale o SDK: npm install @typesafe-ai/sdk (ou o nome oficial)
+ * Centraliza as decisões de seleção de animais e avaliação de progresso.
+ * Mantém a interface nomeada como "jev" para facilitar integração futura
+ * com a API TypeSafe caso o jogo cresça o suficiente para justificar.
  */
-
-// TODO: importar SDK quando disponível
-// import { JevClient } from '@typesafe-ai/sdk';
-// const jev = new JevClient({ apiKey: JEV_API_KEY });
 
 import { ANIMAIS } from './animals.js';
 
 /**
- * JEV Choice — escolhe 4 animais para a rodada.
+ * Escolhe 4 animais para a rodada, evitando os vistos recentemente.
  *
- * @param {object} estadoJogador - { acertos, total, indicesRecentes: number[] }
- * @returns {Promise<number[]>} - 4 índices do array ANIMAIS
+ * @param {object} estado - { indicesRecentes: number[] }
+ * @returns {Promise<number[]>} - 4 índices de ANIMAIS
  */
-export async function jevEscolherAnimais(estadoJogador) {
-  /*
-  TODO: JEV real
-  const resultado = await jev.choice({
-    question: "Quais 4 animais apresentar agora para uma criança de 3 anos?",
-    options: ANIMAIS.map((a, i) => ({ id: i, label: a.nome, meta: a.categoria })),
-    state: estadoJogador,
-    count: 4,
-  });
-  return resultado.selected;
-  */
-
-  // Fallback: sorteia sem repetir os recentes
-  const recentes = estadoJogador.indicesRecentes ?? [];
+export async function jevEscolherAnimais(estado) {
+  const recentes = estado.indicesRecentes ?? [];
   const pool = [...Array(ANIMAIS.length).keys()].filter(i => !recentes.includes(i));
   return embaralhar(pool).slice(0, 4);
 }
 
 /**
- * JEV Score — avalia o desempenho da criança (0–10).
+ * Avalia o desempenho atual e retorna um nível de 0 a 10.
+ * Pode ser usado no futuro para ajustar dificuldade ou introduzir novos animais.
  *
- * @param {object} estadoJogador
- * @returns {Promise<number>} - pontuação para calibrar dificuldade
+ * @param {object} estado - { acertos: number, total: number }
+ * @returns {Promise<number>}
  */
-export async function jevAvaliarProgresso(estadoJogador) {
-  /*
-  TODO: JEV real
-  const resultado = await jev.score({
-    question: "Qual o nível de acerto e engajamento desta criança?",
-    criteria: ["taxa de acerto", "tempo de resposta médio", "erros consecutivos"],
-    state: estadoJogador,
-  });
-  return resultado.score;
-  */
-
-  const taxa = estadoJogador.total > 0
-    ? estadoJogador.acertos / estadoJogador.total
-    : 0.5;
-  return Math.round(taxa * 10);
+export async function jevAvaliarProgresso(estado) {
+  if (estado.total === 0) return 5;
+  return Math.round((estado.acertos / estado.total) * 10);
 }
 
 /**
- * JEV Noul — verifica se a resposta está correta (com nível de confiança).
+ * Verifica se a resposta da criança está correta.
  *
  * @param {number} indiceTocado
  * @param {number} indiceAlvo
- * @returns {Promise<{ valor: boolean, confianca: number }>}
+ * @returns {Promise<{ valor: boolean }>}
  */
 export async function jevVerificarResposta(indiceTocado, indiceAlvo) {
-  /*
-  TODO: JEV real
-  const resultado = await jev.noul({
-    question: "A criança tocou no animal correto?",
-    state: {
-      tocou: ANIMAIS[indiceTocado].nome,
-      alvo: ANIMAIS[indiceAlvo].nome,
-    },
-  });
-  return { valor: resultado.value, confianca: resultado.confidence };
-  */
-
-  return { valor: indiceTocado === indiceAlvo, confianca: 1.0 };
+  return { valor: indiceTocado === indiceAlvo };
 }
 
 // ── util ──────────────────────────────────────────────────────────────────────

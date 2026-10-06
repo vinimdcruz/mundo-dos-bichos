@@ -17,6 +17,16 @@ mundo-dos-bichos/
     game.js           # Lógica do jogo; orquestra os demais módulos
 ```
 
+## Rodar localmente
+
+ES Modules são bloqueados pelo browser via `file://`. Sempre usar um servidor HTTP:
+
+```bash
+npm run dev   # inicia em http://localhost:3000
+```
+
+No celular: conecta na mesma rede Wi-Fi e acessa `http://<IP-do-mac>:3000`.
+
 ## Regras de desenvolvimento
 
 - Código sempre em português (variáveis, comentários, nomes de funções).
@@ -26,15 +36,11 @@ mundo-dos-bichos/
 - Mobile-first. Testar sempre com DevTools em viewport 390×844 (iPhone 14).
 - Nunca usar `alert()`, `confirm()` ou `prompt()`.
 
-## Integração JEV
+## Módulo jev.js
 
-As funções em `src/jev.js` têm fallback local enquanto a API key não estiver disponível.
-Quando integrar, definir a variável de ambiente `JEV_API_KEY` e descomentar as chamadas reais.
-
-Primitivos usados:
-- **Choice** (`jevEscolherAnimais`) - seleciona os 4 animais de cada rodada
-- **Score** (`jevAvaliarProgresso`) - pontua o desempenho para ajustar dificuldade
-- **Noul** (`jevVerificarResposta`) - confirma se a resposta está correta
+Contém a lógica adaptativa do jogo (seleção de animais, verificação de resposta, avaliação de progresso).
+É lógica local pura; a interface foi nomeada com o prefixo `jev` para facilitar integração futura com
+a API TypeSafe se o jogo crescer o suficiente para justificar IA real.
 
 ## Publicação do artefato
 

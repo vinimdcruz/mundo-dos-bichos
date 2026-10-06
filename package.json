@@ -1,0 +1,10 @@
+{
+  "name": "mundo-dos-bichos",
+  "version": "0.1.0",
+  "description": "Jogo educativo mobile-first para crianças de 3 anos",
+  "scripts": {
+    "dev": "npx serve . --listen 3000 --no-clipboard",
+    "start": "npx serve . --listen 3000 --no-clipboard"
+  },
+  "private": true
+}
