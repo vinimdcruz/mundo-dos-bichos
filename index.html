@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Mundo dos Bichos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap">
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+<!-- ── Tela inicial ──────────────────────────────────────────── -->
+<div id="tela-inicial">
+  <div style="font-size:5rem">🦁</div>
+  <h1>Mundo dos Bichos</h1>
+  <p>Escuta o nome do animal e toca na foto certa!</p>
+  <button id="btn-iniciar">Vamos jogar!</button>
+</div>
+
+<!-- ── Jogo ─────────────────────────────────────────────────── -->
+<div id="app">
+  <div id="topbar">
+    <div id="pontuacao">⭐ 0</div>
+    <button id="btn-musica">🎵</button>
+  </div>
+
+  <button id="btn-nome">
+    <span id="icone-falar">🔊</span>
+    <span id="nome-animal">…</span>
+  </button>
+
+  <div id="grade">
+    <div class="cartao-animal" data-indice=""></div>
+    <div class="cartao-animal" data-indice=""></div>
+    <div class="cartao-animal" data-indice=""></div>
+    <div class="cartao-animal" data-indice=""></div>
+  </div>
+</div>
+
+<!-- ── Feedback ──────────────────────────────────────────────── -->
+<div id="feedback">
+  <span id="feedback-emoji"></span>
+  <span id="feedback-texto"></span>
+</div>
+
+<script type="module" src="src/game.js"></script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Tokens
+───────────────────────────────────────────────────────────────────────────── */
+:root {
+  --bg:       #FFF9EE;
+  --cartao:   #FFFFFF;
+  --borda:    #FFE08A;
+  --acento:   #FF8C00;
+  --acento2:  #3A86FF;
+  --correto:  #2ECC71;
+  --errado:   #E74C3C;
+  --texto:    #1A1A2E;
+  --muted:    #7A7A9A;
+  --sombra:   0 6px 20px rgba(0,0,0,0.12);
+  --raio:     24px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:     #1A1A2E;
+    --cartao: #252545;
+    --borda:  #3A3A6A;
+    --texto:  #F0EED8;
+    --muted:  #9999BB;
+    --sombra: 0 6px 20px rgba(0,0,0,0.4);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg:     #1A1A2E;
+  --cartao: #252545;
+  --borda:  #3A3A6A;
+  --texto:  #F0EED8;
+  --muted:  #9999BB;
+  --sombra: 0 6px 20px rgba(0,0,0,0.4);
+  color-scheme: dark;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Base
+───────────────────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--texto);
+  font-family: 'Nunito', 'Rounded Mplus 1c', system-ui, sans-serif;
+  overflow: hidden;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Layout principal
+───────────────────────────────────────────────────────────────────────────── */
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-inline: 16px;
+  padding-block: 12px;
+  gap: 12px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Barra superior
+───────────────────────────────────────────────────────────────────────────── */
+#topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+#pontuacao {
+  background: var(--acento);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 900;
+  padding: 6px 16px;
+  border-radius: 999px;
+  min-width: 64px;
+  text-align: center;
+}
+
+#btn-musica {
+  background: var(--cartao);
+  border: 2px solid var(--borda);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: transform 0.15s;
+  line-height: 1;
+}
+#btn-musica:active { transform: scale(0.9); }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Cartão do nome
+───────────────────────────────────────────────────────────────────────────── */
+#btn-nome {
+  background: var(--cartao);
+  border: 3px solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: transform 0.1s;
+  width: 100%;
+}
+#btn-nome:active { transform: scale(0.97); }
+
+#nome-animal {
+  font-size: clamp(2rem, 8vw, 2.8rem);
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: var(--acento);
+  text-transform: uppercase;
+}
+
+#icone-falar {
+  font-size: 2rem;
+  animation: pulsar 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulsar {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.18); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Grade de animais
+───────────────────────────────────────────────────────────────────────────── */
+#grade {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  min-height: 0;
+}
+
+.cartao-animal {
+  background: var(--cartao);
+  border: 3px solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(3.5rem, 14vw, 5.5rem);
+  cursor: pointer;
+  transition: transform 0.12s, border-color 0.15s, background 0.15s;
+}
+.cartao-animal:active { transform: scale(0.93); }
+
+.cartao-animal.correto {
+  border-color: var(--correto);
+  background: #EAFAF1;
+  animation: saltarEntrada 0.4s ease;
+}
+.cartao-animal.errado {
+  border-color: var(--errado);
+  background: #FDEDEC;
+  animation: tremer 0.4s ease;
+}
+
+@keyframes saltarEntrada {
+  0%   { transform: scale(0.88); }
+  60%  { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+@keyframes tremer {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-9px); }
+  40%       { transform: translateX(9px); }
+  60%       { transform: translateX(-6px); }
+  80%       { transform: translateX(6px); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Overlay de feedback
+───────────────────────────────────────────────────────────────────────────── */
+#feedback {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+#feedback.visivel { opacity: 1; pointer-events: all; }
+#feedback.acerto  { background: rgba(46, 204, 113, 0.88); }
+#feedback.erro    { background: rgba(231, 76, 60, 0.88);  }
+
+#feedback-emoji {
+  font-size: clamp(5rem, 22vw, 9rem);
+}
+#feedback-texto {
+  font-size: clamp(2rem, 9vw, 3.2rem);
+  font-weight: 900;
+  color: #fff;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Tela inicial
+───────────────────────────────────────────────────────────────────────────── */
+#tela-inicial {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 32px;
+  z-index: 20;
+}
+
+#tela-inicial h1 {
+  font-size: clamp(2.2rem, 10vw, 3.5rem);
+  font-weight: 900;
+  text-align: center;
+  color: var(--acento);
+  text-wrap: balance;
+}
+
+#tela-inicial p {
+  font-size: 1.2rem;
+  color: var(--muted);
+  text-align: center;
+  text-wrap: balance;
+}
+
+#btn-iniciar {
+  background: var(--acento);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 1.5rem;
+  font-weight: 900;
+  padding: 18px 48px;
+  cursor: pointer;
+  box-shadow: 0 6px 0 #C05E00;
+  transform: translateY(-2px);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+#btn-iniciar:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #C05E00;
+}
