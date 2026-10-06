@@ -17,6 +17,21 @@ mundo-dos-bichos/
     game.js           # Lógica do jogo; orquestra os demais módulos
 ```
 
+## Áudios pré-gerados
+
+Os nomes dos animais são falados por arquivos WAV gerados com a voz **Luciana** (macOS pt-BR nativa),
+muito mais natural do que a Web Speech API do browser. Os WAVs ficam em `assets/audio/` e não são
+versionados no git (binários).
+
+Para (re)gerar após clonar o repo ou adicionar novos animais:
+
+```bash
+bash scripts/gerar-audio.sh
+```
+
+Requer macOS. O script pula arquivos que já existem.
+Se quiser trocar a voz, edite a variável `VOZ` no script.
+
 ## Rodar localmente
 
 ES Modules são bloqueados pelo browser via `file://`. Sempre usar um servidor HTTP:

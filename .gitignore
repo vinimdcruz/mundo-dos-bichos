@@ -1,1 +1,4 @@
 .DS_Store
+
+# Áudios pré-gerados (binários; regenerar com: bash scripts/gerar-audio.sh)
+assets/audio/*.wav
