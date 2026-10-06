@@ -20,8 +20,16 @@ let vozFallback = null;
  *
  * @param {string[]} nomes
  */
-export function precarregarAudios(nomes) {
-  nomes.forEach(async nome => {
+/**
+ * Carrega e decodifica todos os WAVs via AudioContext.
+ * Retorna uma Promise que resolve quando tudo estiver pronto.
+ * Chamar após iniciarMusica() (precisa do contexto desbloqueado).
+ *
+ * @param {string[]} nomes
+ * @returns {Promise<void>}
+ */
+export async function precarregarAudios(nomes) {
+  await Promise.all(nomes.map(async nome => {
     if (buffers.has(nome)) return;
     try {
       const resp = await fetch(`${CAMINHO_AUDIO}/${encodeURIComponent(nome)}.wav`);
@@ -30,9 +38,9 @@ export function precarregarAudios(nomes) {
       const buffer = await obterContexto().decodeAudioData(arrayBuffer);
       buffers.set(nome, buffer);
     } catch {
-      // silencia erros de rede; fallback para síntese quando o nome for pedido
+      // fallback para síntese será usado quando este nome for pedido
     }
-  });
+  }));
 }
 
 /**
