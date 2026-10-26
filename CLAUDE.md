@@ -10,7 +10,8 @@ mundo-dos-bichos/
   styles/
     main.css          # Tokens de cor, layout, animações
   src/
-    animals.js        # Catálogo de animais (emoji + nome pt-BR)
+    animals.js        # Catálogo de animais (imagem + nome pt-BR + nome en)
+    idiomas.js        # Idioma atual (pt/en), textos da interface e nome dos animais
     speech.js         # Síntese de voz em pt-BR (Web Speech API)
     audio.js          # Música de fundo (Web Audio API) e efeitos sonoros
     jev.js            # Camada de integração JEV (TypeSafe AI)
@@ -30,7 +31,11 @@ bash scripts/gerar-audio.sh
 ```
 
 Requer macOS. O script pula arquivos que já existem.
-Se quiser trocar a voz, edite a variável `VOZ` no script.
+Se quiser trocar as vozes, edite `VOZ` e `VOZ_EN` no script.
+
+## Idiomas
+
+O idioma (pt/en) é escolhido na tela inicial, antes de começar, e lembrado no `localStorage`. Textos da interface ficam em `src/idiomas.js`; ao adicionar um animal, preencher `nome` e `en` em `animals.js` e regenerar os áudios.
 
 ## Rodar localmente
 

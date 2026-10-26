@@ -13,8 +13,12 @@
 <!-- ── Tela inicial ──────────────────────────────────────────── -->
 <div id="tela-inicial">
   <div style="font-size:5rem">🦁</div>
-  <h1>Mundo dos Bichos</h1>
-  <p>Escuta o nome do animal e toca na foto certa!</p>
+  <h1 id="titulo-inicial">Mundo dos Bichos</h1>
+  <p id="subtitulo-inicial">Escuta o nome do animal e toca na foto certa!</p>
+  <div id="seletor-idioma" role="group" aria-label="Idioma / Language">
+    <button type="button" class="btn-idioma" data-idioma="pt" aria-pressed="true">🇧🇷 Português</button>
+    <button type="button" class="btn-idioma" data-idioma="en" aria-pressed="false">🇺🇸 English</button>
+  </div>
   <button id="btn-iniciar">Vamos jogar!</button>
 </div>
 

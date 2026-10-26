@@ -1,7 +1,7 @@
 /**
  * Módulo de fala.
  *
- * Toca arquivos WAV pré-gerados de assets/audio/{nome}.wav.
+ * Toca arquivos WAV pré-gerados: assets/audio/{nome}.wav (pt) e assets/audio/en/{nome}.wav (en).
  * Fallback para Web Speech API se o arquivo não estiver em cache.
  *
  * IMPORTANTE (iOS): Audio.play() só funciona fora de um gesto do usuário
@@ -9,22 +9,25 @@
  * Por isso, chamar precarregarAudios() dentro do handler do botão iniciar.
  */
 
-const CAMINHO_AUDIO = 'assets/audio';
+const CAMINHO_AUDIO = { pt: 'assets/audio', en: 'assets/audio/en' };
+const LANG_VOZ = { pt: 'pt-BR', en: 'en-US' };
 const cache = new Map();
-let vozFallback = null;
+const vozesFallback = {};
 
 /**
  * Pré-carrega todos os Audio elements durante um gesto do usuário.
  * Deve ser chamado diretamente no handler de clique (sem await antes).
  *
  * @param {string[]} nomes
+ * @param {'pt'|'en'} idioma
  */
-export function precarregarAudios(nomes) {
+export function precarregarAudios(nomes, idioma) {
   nomes.forEach(nome => {
-    if (cache.has(nome)) return;
-    const audio = new Audio(`${CAMINHO_AUDIO}/${encodeURIComponent(nome)}.wav`);
+    const chave = `${idioma}/${nome}`;
+    if (cache.has(chave)) return;
+    const audio = new Audio(`${CAMINHO_AUDIO[idioma]}/${encodeURIComponent(nome)}.wav`);
     audio.load();
-    cache.set(nome, audio);
+    cache.set(chave, audio);
   });
 }
 
@@ -38,11 +41,14 @@ export function inicializarFala() {
   function selecionarVoz() {
     const vozes = window.speechSynthesis.getVoices();
     if (!vozes.length) return;
-    vozFallback =
-      vozes.find(v => v.lang === 'pt-BR' && v.localService) ??
-      vozes.find(v => v.lang === 'pt-BR') ??
-      vozes.find(v => v.lang.startsWith('pt')) ??
-      null;
+    for (const [idioma, lang] of Object.entries(LANG_VOZ)) {
+      const base = lang.slice(0, 2);
+      vozesFallback[idioma] =
+        vozes.find(v => v.lang === lang && v.localService) ??
+        vozes.find(v => v.lang === lang) ??
+        vozes.find(v => v.lang.startsWith(base)) ??
+        null;
+    }
   }
 
   selecionarVoz();
@@ -54,17 +60,18 @@ export function inicializarFala() {
  * Usa o WAV do cache; fallback para síntese de voz.
  *
  * @param {string} nome
+ * @param {'pt'|'en'} idioma
  */
-export async function falarNomeAnimal(nome) {
-  const tocou = await tentarWav(nome);
-  if (!tocou) usarSintese(nome);
+export async function falarNomeAnimal(nome, idioma) {
+  const tocou = await tentarWav(nome, idioma);
+  if (!tocou) usarSintese(nome, idioma);
 }
 
 // ── Interno ───────────────────────────────────────────────────────────────────
 
-async function tentarWav(nome) {
+async function tentarWav(nome, idioma) {
   try {
-    const audio = cache.get(nome);
+    const audio = cache.get(`${idioma}/${nome}`);
     if (!audio) return false;
     audio.currentTime = 0;
     await audio.play();
@@ -74,13 +81,13 @@ async function tentarWav(nome) {
   }
 }
 
-function usarSintese(texto) {
+function usarSintese(texto, idioma) {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   const utt = new SpeechSynthesisUtterance(texto);
-  utt.lang  = 'pt-BR';
+  utt.lang  = LANG_VOZ[idioma];
   utt.rate  = 0.82;
   utt.pitch = 1.1;
-  if (vozFallback) utt.voice = vozFallback;
+  if (vozesFallback[idioma]) utt.voice = vozesFallback[idioma];
   window.speechSynthesis.speak(utt);
 }

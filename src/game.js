@@ -17,6 +17,9 @@ import {
   avaliarProgresso,
   verificarResposta,
 }                                from './logica.js';
+import {
+  idiomaAtual, definirIdioma, t, nomeDoAnimal,
+}                                from './idiomas.js';
 
 // ── Estado ────────────────────────────────────────────────────────────────────
 
@@ -55,7 +58,7 @@ async function novaRodada() {
   const slotAlvo = Math.floor(Math.random() * 4);
   estado.indiceAlvo = opcoes[slotAlvo];
 
-  $nomeAnimal.textContent = ANIMAIS[estado.indiceAlvo].nome;
+  $nomeAnimal.textContent = nomeDoAnimal(ANIMAIS[estado.indiceAlvo]);
   $cartoes.forEach((cartao, i) => {
     const img = document.createElement('img');
     img.src = ANIMAIS[opcoes[i]].imagem;
@@ -67,7 +70,7 @@ async function novaRodada() {
   });
 
   // Fala o nome automaticamente a cada nova rodada
-  setTimeout(() => falarNomeAnimal(ANIMAIS[estado.indiceAlvo].nome), 400);
+  setTimeout(() => falarNomeAnimal(nomeDoAnimal(ANIMAIS[estado.indiceAlvo]), idiomaAtual()), 400);
 }
 
 // ── Interação ─────────────────────────────────────────────────────────────────
@@ -111,7 +114,7 @@ async function aoTocarCartao(cartao) {
 function mostrarFeedback(acertou) {
   $feedback.className = 'visivel ' + (acertou ? 'acerto' : 'erro');
   $feedbackEmoji.textContent = acertou ? '🎉' : '😅';
-  $feedbackTexto.textContent = acertou ? 'Muito bem!' : 'Tente de novo!';
+  $feedbackTexto.textContent = acertou ? t('acerto') : t('erro');
 }
 
 function esconderFeedback() {
@@ -126,7 +129,7 @@ function atualizarPontuacao() {
 
 $btnNome.addEventListener('click', () => {
   if (ANIMAIS[estado.indiceAlvo]) {
-    falarNomeAnimal(ANIMAIS[estado.indiceAlvo].nome);
+    falarNomeAnimal(nomeDoAnimal(ANIMAIS[estado.indiceAlvo]), idiomaAtual());
   }
 });
 
@@ -148,9 +151,33 @@ $cartoes.forEach(cartao => {
 
 inicializarFala();
 
+// ── Seletor de idioma (tela inicial) ──────────────────────────────────────────
+
+const $btnsIdioma = document.querySelectorAll('.btn-idioma');
+
+function aplicarIdioma() {
+  document.documentElement.lang = t('htmlLang');
+  document.title = t('titulo');
+  document.getElementById('titulo-inicial').textContent    = t('titulo');
+  document.getElementById('subtitulo-inicial').textContent = t('subtitulo');
+  $btnIniciar.textContent = t('iniciar');
+  $btnsIdioma.forEach(b => {
+    b.setAttribute('aria-pressed', String(b.dataset.idioma === idiomaAtual()));
+  });
+}
+
+$btnsIdioma.forEach(b => {
+  b.addEventListener('click', () => {
+    definirIdioma(b.dataset.idioma);
+    aplicarIdioma();
+  });
+});
+
+aplicarIdioma();
+
 $btnIniciar.addEventListener('click', async () => {
   // Pré-carrega todos os áudios AQUI, dentro do gesto — obrigatório no iOS
-  precarregarAudios(ANIMAIS.map(a => a.nome));
+  precarregarAudios(ANIMAIS.map(nomeDoAnimal), idiomaAtual());
 
   // Aguarda o AudioContext estar ativo antes de continuar
   await iniciarMusica();
