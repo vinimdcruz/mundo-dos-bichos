@@ -9,6 +9,7 @@ export const TEXTOS = Object.freeze({
   pt: {
     htmlLang:  'pt-BR',
     vozLang:   'pt-BR',
+    rotuloIdioma: '🇧🇷 PT',
     titulo:    'Mundo dos Bichos',
     subtitulo: 'Escuta o nome do animal e toca na foto certa!',
     iniciar:   'Vamos jogar!',
@@ -18,6 +19,7 @@ export const TEXTOS = Object.freeze({
   en: {
     htmlLang:  'en',
     vozLang:   'en-US',
+    rotuloIdioma: '🇺🇸 EN',
     titulo:    'Animal World',
     subtitulo: 'Listen to the animal name and tap the right picture!',
     iniciar:   "Let's play!",

@@ -91,6 +91,12 @@ html, body {
   text-align: center;
 }
 
+#topbar-botoes {
+  display: flex;
+  gap: 8px;
+}
+
+#btn-idioma-jogo,
 #btn-musica {
   background: var(--cartao);
   border: 2px solid var(--borda);
@@ -101,6 +107,13 @@ html, body {
   transition: transform 0.15s;
   line-height: 1;
 }
+#btn-idioma-jogo {
+  color: var(--texto);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 900;
+}
+#btn-idioma-jogo:active,
 #btn-musica:active { transform: scale(0.9); }
 
 /* ─────────────────────────────────────────────────────────────────────────────
