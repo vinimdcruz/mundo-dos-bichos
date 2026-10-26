@@ -41,6 +41,7 @@ const $feedback      = document.getElementById('feedback');
 const $feedbackEmoji = document.getElementById('feedback-emoji');
 const $feedbackTexto = document.getElementById('feedback-texto');
 const $btnMusica     = document.getElementById('btn-musica');
+const $btnIdiomaJogo = document.getElementById('btn-idioma-jogo');
 const $btnNome       = document.getElementById('btn-nome');
 const $telaInicial   = document.getElementById('tela-inicial');
 const $btnIniciar    = document.getElementById('btn-iniciar');
@@ -158,9 +159,13 @@ const $btnsIdioma = document.querySelectorAll('.btn-idioma');
 function aplicarIdioma() {
   document.documentElement.lang = t('htmlLang');
   document.title = t('titulo');
-  document.getElementById('titulo-inicial').textContent    = t('titulo');
-  document.getElementById('subtitulo-inicial').textContent = t('subtitulo');
-  $btnIniciar.textContent = t('iniciar');
+  // A tela inicial é removida do DOM ao começar o jogo
+  if ($telaInicial.isConnected) {
+    document.getElementById('titulo-inicial').textContent    = t('titulo');
+    document.getElementById('subtitulo-inicial').textContent = t('subtitulo');
+    $btnIniciar.textContent = t('iniciar');
+  }
+  $btnIdiomaJogo.textContent = t('rotuloIdioma');
   $btnsIdioma.forEach(b => {
     b.setAttribute('aria-pressed', String(b.dataset.idioma === idiomaAtual()));
   });
@@ -171,6 +176,22 @@ $btnsIdioma.forEach(b => {
     definirIdioma(b.dataset.idioma);
     aplicarIdioma();
   });
+});
+
+// ── Botão de idioma durante o jogo ────────────────────────────────────────────
+
+$btnIdiomaJogo.addEventListener('click', () => {
+  definirIdioma(idiomaAtual() === 'pt' ? 'en' : 'pt');
+  aplicarIdioma();
+
+  // Pré-carrega os áudios do novo idioma dentro do gesto (iOS)
+  precarregarAudios(ANIMAIS.map(nomeDoAnimal), idiomaAtual());
+
+  const alvo = ANIMAIS[estado.indiceAlvo];
+  if (alvo) {
+    $nomeAnimal.textContent = nomeDoAnimal(alvo);
+    falarNomeAnimal(nomeDoAnimal(alvo), idiomaAtual());
+  }
 });
 
 aplicarIdioma();
