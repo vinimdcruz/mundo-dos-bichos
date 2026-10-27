@@ -174,14 +174,25 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.12s, border-color 0.15s, background 0.15s;
 }
+/* Fundo: a própria foto ampliada e desfocada, para preencher o cartão */
+.cartao-animal::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  background: var(--foto) center / cover;
+  filter: blur(18px) brightness(0.9);
+}
+/* Foto inteira, sem corte */
 .cartao-animal img {
+  position: relative;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   pointer-events: none;
   user-select: none;
   -webkit-user-drag: none;

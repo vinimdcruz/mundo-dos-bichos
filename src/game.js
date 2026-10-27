@@ -65,6 +65,7 @@ async function novaRodada() {
     img.src = ANIMAIS[opcoes[i]].imagem;
     img.alt = '';
     img.draggable = false;
+    cartao.style.setProperty('--foto', `url(${img.src})`);
     cartao.replaceChildren(img);
     cartao.className = 'cartao-animal';
     cartao.dataset.indice = opcoes[i];
